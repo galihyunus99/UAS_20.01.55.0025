@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Laptop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, button {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .response {
+            background: #eaf7f0;
+            color: #2ecc71;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #f4f4f4;
+            font-weight: bold;
+        }
+        td {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manajemen Laptop</h1>
+
+        <!-- Form Create/Update Laptop -->
+        <div class="card">
+            <h3>Tambah/Update Laptop</h3>
+            <form id="laptopForm">
+                <label for="id">ID (kosongkan untuk menambah data baru):</label>
+                <input type="number" id="id" name="id" placeholder="ID (untuk update)" />
+        
+                <label for="brand">Brand:</label>
+                <input type="text" id="brand" name="brand" placeholder="Brand" required />
+        
+                <label for="model">Model:</label>
+                <input type="text" id="model" name="model" placeholder="Model" required />
+        
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" placeholder="Price" required />
+        
+                <label for="stock">Stock:</label>
+                <input type="number" id="stock" name="stock" placeholder="Stock" required />
+        
+                <button type="submit">Simpan</button>
+            </form>
+            <div id="response"></div>
+        </div>
+        
+
+        <!-- Form Delete Laptop -->
+        <div class="card">
+            <h3>Hapus Laptop</h3>
+            <form id="deleteForm">
+                <label for="deleteId">ID:</label>
+                <input type="number" id="deleteId" placeholder="ID untuk dihapus" required />
+                <button type="submit">Hapus</button>
+            </form>
+        </div>
+
+        <!-- Button Fetch Data -->
+        <div class="button-group">
+            <button id="fetchData">Tampilkan Semua Data</button>
+        </div>
+
+        <!-- Response Section -->
+        <div class="response" id="response"></div>
+
+        <!-- Data Table -->
+        <div class="card table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+
+        const apiUrl = 'http://localhost/laptop_management_api/api/laptops';
+
+        // Handle Create/Update
+        document.getElementById('laptopForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('id').value;
+            const brand = document.getElementById('brand').value;
+            const model = document.getElementById('model').value;
+            const price = document.getElementById('price').value;
+            const stock = document.getElementById('stock').value;
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiUrl}/update.php?id=${id}` : `${apiUrl}/create.php`;
+
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ brand, model, price, stock }),
+            });
+
+            const result = await response.json();
+            document.getElementById('response').innerText = JSON.stringify(result.message, null, 2);
+        });
+
+        // Handle Delete
+        document.getElementById('deleteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('deleteId').value;
+
+            const response = await fetch(`${apiUrl}/delete.php?id=${id}`, {
+                method: 'DELETE',
+            });
+
+            const result = await response.json();
+            document.getElementById('response').innerText = JSON.stringify(result.message, null, 2);
+        });
+
+        // Fetch All Data
+        document.getElementById('fetchData').addEventListener('click', async () => {
+            const response = await fetch(`${apiUrl}/read.php`);
+            const result = await response.json();
+
+            const tableBody = document.getElementById('dataTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+
+            if (result.data) {
+                result.data.forEach((item) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.brand}</td>
+                        <td>${item.model}</td>
+                        <td>${item.price}</td>
+                        <td>${item.stock}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="5">Tidak ada data</td></tr>';
+            }
+            
+        });
+
+        
+    </script>
+</body>
+</html>
