@@ -18,6 +18,21 @@ Proyek ini adalah aplikasi API manajemen data laptop yang memungkinkan pengguna 
 4. API mengirimkan respons yang sesuai, baik berhasil atau gagal.
 ## Tujuan:
 Proyek ini bertujuan untuk memberikan solusi manajemen data laptop dalam aplikasi berbasis API, memungkinkan integrasi dengan sistem lain atau aplikasi frontend untuk menampilkan dan memanipulasi data laptop secara efisien.
+## Struktur Diktori
+```arduino
+C:\xampp\htdocs\laptop_management_api
+├── index.html
+├── api
+│   ├── config.php
+│   ├── laptop.php
+│   ├── laptops
+│       ├── create.php
+│       ├── read.php
+│       ├── read_single.php
+│       ├── update.php
+│       ├── delete.php
+├── README.md
+``` 
 ## Hasil 
 1. Menambah dan Update Data
 ![WhatsApp Image 2025-01-09 at 22 07 30](https://github.com/user-attachments/assets/3c4fa9ed-2a88-4cf6-a910-10a5a3f4ec5d)
